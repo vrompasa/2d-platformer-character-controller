@@ -9,13 +9,16 @@ The repository contains all required assets for a demo scene to demonstrate the 
   - Support for one-way platforms with the ability to drop through
   - Reactive jump: Jump input is still recognized right before and after being grounded
   - Ability to control jump height by releasing the jump button mid jump
+### Not supported:
+  - Slopes
+  - Moving platforms
 
 ## Setting up
   1. Add the `MovementController.cs` and `Player.cs` scripts to your player game object.
   2. Make sure the player has a **Box Collider 2D** attached to it.
   3. Set up the collision masks inside the inspector.
   4. Start tweaking the parameters!
-### One-way platforms
+### One-way platforms:
   1. Attach **Edge Collider 2D** to the platform game object.
   2. Tag the platform as `Platform`.
 

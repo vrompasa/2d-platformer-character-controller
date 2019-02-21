@@ -45,6 +45,7 @@ public class Player : MonoBehaviour
     {
         get { return !IsGrounded && GroundIsNear && _controller.Velocity.y < 0; }
     }
+    public bool IsTouchingWall { get { return _controller.State.IsCollidingLeft || _controller.State.IsCollidingRight; } }
 
 	private bool _isFacingRight;
 	private float _normalizedHorizontalSpeed;
@@ -68,6 +69,9 @@ public class Player : MonoBehaviour
         if (_controller.Velocity.y < 0)
             Jumpping = false;
 
+        if (IsTouchingWall && _controller.Velocity.y < 0)
+            _controller.SetVerticalForce(_controller.Velocity.y * 0.5f);
+            
 		HandleInput();
 		
 		var acceleration = IsGrounded ? _controller.Parameters.AccelerationOnGround : _controller.Parameters.AccelerationInAir;
@@ -88,6 +92,9 @@ public class Player : MonoBehaviour
 
 		if ((Input.GetButtonDown("Jump") && IsGrounded && !Jumpping) || (JumpWhenGrounded && IsGrounded)) 
 			Jump(JumpMagnitude);
+
+        if (Input.GetButtonDown("Jump") && (_controller.State.IsCollidingLeft || _controller.State.IsCollidingRight))
+            Jump(JumpMagnitude);
 
 		if (Jumpping && !Input.GetButton("Jump"))
 			_controller.AddForce(new Vector2(0, JumpInterruptStrength));

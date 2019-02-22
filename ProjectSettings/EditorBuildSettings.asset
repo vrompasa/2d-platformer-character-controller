@@ -8,7 +8,10 @@ EditorBuildSettings:
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Scenes/main.unity
     guid: fe2a4e2ef57f34356a28ced384a92b28
+  - enabled: 1
+    path: Assets/_Scenes/wall_jump.unity
+    guid: e00ed41c7ea68440d9bdd11b7ef18c20
   m_configObjects: {}

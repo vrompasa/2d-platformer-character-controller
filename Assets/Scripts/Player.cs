@@ -3,7 +3,7 @@
 public class Player : MonoBehaviour
 {
     [Tooltip("Jump strenght.")]
-    public float JumpMagnitude = 8f;
+    public float JumpMagnitude = 12f;
 
     [Tooltip("The amount of force used to interrupt a jump.")]
     public float JumpInterruptStrength = 120f;
@@ -23,6 +23,9 @@ public class Player : MonoBehaviour
 
     [Tooltip("Is wall jumping allowed?")]
     public bool WallJump = true;
+
+    [Tooltip("Direction and strength of wall jump")]
+    public Vector2 WallJumpForce = new Vector2(12, 12);
 
     public bool Jumpping { get; set; }
     public bool JumpWhenGrounded { get; set; }
@@ -107,7 +110,7 @@ public class Player : MonoBehaviour
 			Jump(JumpMagnitude);
 
         if (CanWallJump && Input.GetButtonDown("Jump"))
-            Jump(JumpMagnitude);
+            JumpOffWall(WallJumpForce);
 
 		if (Jumpping && !Input.GetButton("Jump"))
 			_controller.AddVerticalForce(-JumpInterruptStrength);
@@ -120,6 +123,14 @@ public class Player : MonoBehaviour
         JumpWhenGrounded = false;
         Jumpping = true;
         _controller.SetVerticalForce(magnitude);
+    }
+
+    void JumpOffWall(Vector2 force)
+    {
+        JumpWhenGrounded = false;
+        Jumpping = true;
+        var jumpVector = new Vector2(_controller.State.IsCollidingLeft ? force.x : -force.x, force.y);
+        _controller.SetForce(jumpVector);
     }
 
 	void Flip()

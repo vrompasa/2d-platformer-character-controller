@@ -6,13 +6,23 @@ public class Player : MonoBehaviour
     public float JumpMagnitude = 8f;
 
     [Tooltip("The amount of force used to interrupt a jump.")]
-    public float JumpInterruptStrength = -2.0f;
+    public float JumpInterruptStrength = 120f;
 
     [Tooltip("How long can the player still be considered grounded after leaving the ground?")]
 	public float GroundedLinger = 0.05f;
     
     [Tooltip("The distance below the player where jump input is registered while falling.")]
 	public float GroundCheckDistance = 0.5f;
+
+    [Tooltip("Will the player be able to slide off walls?")]
+    public bool WallSlide = true;
+
+    [Tooltip("How fast does the player slide off walls?")]
+    [Range(0, 1)]
+    public float WallFriction = 0.5f;
+
+    [Tooltip("Is wall jumping allowed?")]
+    public bool WallJump = true;
 
     public bool Jumpping { get; set; }
     public bool JumpWhenGrounded { get; set; }
@@ -41,11 +51,9 @@ public class Player : MonoBehaviour
             return rayHit;
         }
     }
-	public bool AnticipateJump
-    {
-        get { return !IsGrounded && GroundIsNear && _controller.Velocity.y < 0; }
-    }
+	public bool AnticipateJump { get { return !IsGrounded && GroundIsNear && _controller.Velocity.y < 0; } }
     public bool IsTouchingWall { get { return _controller.State.IsCollidingLeft || _controller.State.IsCollidingRight; } }
+    public bool CanWallJump { get { return WallJump && IsTouchingWall; } }
 
 	private bool _isFacingRight;
 	private float _normalizedHorizontalSpeed;
@@ -69,9 +77,14 @@ public class Player : MonoBehaviour
         if (_controller.Velocity.y < 0)
             Jumpping = false;
 
-        if (IsTouchingWall && _controller.Velocity.y < 0)
-            _controller.SetVerticalForce(_controller.Velocity.y * 0.5f);
-            
+        if (WallSlide && IsTouchingWall && _controller.Velocity.y <= 0)
+        {
+            if (WallFriction == 1)
+                _controller.Parameters.Flying = true;
+            _controller.SetVerticalForce(_controller.Velocity.y * (1 - WallFriction));
+        }
+        else _controller.Parameters.Flying = false;
+        
 		HandleInput();
 		
 		var acceleration = IsGrounded ? _controller.Parameters.AccelerationOnGround : _controller.Parameters.AccelerationInAir;
@@ -93,11 +106,11 @@ public class Player : MonoBehaviour
 		if ((Input.GetButtonDown("Jump") && IsGrounded && !Jumpping) || (JumpWhenGrounded && IsGrounded)) 
 			Jump(JumpMagnitude);
 
-        if (Input.GetButtonDown("Jump") && (_controller.State.IsCollidingLeft || _controller.State.IsCollidingRight))
+        if (CanWallJump && Input.GetButtonDown("Jump"))
             Jump(JumpMagnitude);
 
 		if (Jumpping && !Input.GetButton("Jump"))
-			_controller.AddForce(new Vector2(0, JumpInterruptStrength));
+			_controller.AddVerticalForce(-JumpInterruptStrength);
 
 		_controller.State.DropThroughPlatform = Input.GetButton("Down");
 	}

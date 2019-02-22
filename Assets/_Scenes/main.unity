@@ -1857,6 +1857,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114026353312155618, guid: 9e3f0e3d44ce744a59b768f73078ff60,
+        type: 3}
+      propertyPath: CanWallJump
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114026353312155618, guid: 9e3f0e3d44ce744a59b768f73078ff60,
+        type: 3}
+      propertyPath: JumpInterruptStrength
+      value: 120
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e3f0e3d44ce744a59b768f73078ff60, type: 3}
 --- !u!1001 &1656598201

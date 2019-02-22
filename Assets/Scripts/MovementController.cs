@@ -59,7 +59,7 @@ public class MovementController : MonoBehaviour
 
     public void AddForce(Vector2 force)
     {
-        _velocity += force;
+        _velocity += force * Time.deltaTime;
     }
     
     public void SetForce(Vector2 force)
@@ -69,7 +69,7 @@ public class MovementController : MonoBehaviour
 
     public void AddHorizontalForce(float x)
     {
-        _velocity.x += x;
+        _velocity.x += x * Time.deltaTime;
     }
 
     public void SetHorizontalForce(float x)
@@ -79,7 +79,7 @@ public class MovementController : MonoBehaviour
 
     public void AddVerticalForce(float y)
     {
-        _velocity.y += y;
+        _velocity.y += y * Time.deltaTime;
     }
 
     public void SetVerticalForce(float y)

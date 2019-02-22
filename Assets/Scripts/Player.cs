@@ -6,7 +6,7 @@ public class Player : MonoBehaviour
     public float JumpMagnitude = 8f;
 
     [Tooltip("The amount of force used to interrupt a jump.")]
-    public float JumpInterruptStrength = -2.0f;
+    public float JumpInterruptStrength = 120f;
 
     [Tooltip("How long can the player still be considered grounded after leaving the ground?")]
 	public float GroundedLinger = 0.05f;
@@ -90,7 +90,7 @@ public class Player : MonoBehaviour
 			Jump(JumpMagnitude);
 
 		if (Jumpping && !Input.GetButton("Jump"))
-			_controller.AddForce(new Vector2(0, JumpInterruptStrength));
+			_controller.AddVerticalForce(-JumpInterruptStrength);
 
 		_controller.State.DropThroughPlatform = Input.GetButton("Down");
 	}

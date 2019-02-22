@@ -168,6 +168,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   JumpMagnitude: 12
-  JumpInterruptStrength: -2
+  JumpInterruptStrength: 120
   GroundedLinger: 0.05
   GroundCheckDistance: 0.5

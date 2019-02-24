@@ -109,7 +109,7 @@ public class Player : MonoBehaviour
 		if ((Input.GetButtonDown("Jump") && IsGrounded && !Jumpping) || (JumpWhenGrounded && IsGrounded)) 
 			Jump(JumpMagnitude);
 
-        if (CanWallJump && Input.GetButtonDown("Jump"))
+        else if (CanWallJump && Input.GetButtonDown("Jump"))
             JumpOffWall(WallJumpForce);
 
 		if (Jumpping && !Input.GetButton("Jump"))

@@ -3,7 +3,7 @@
 public class Player : MonoBehaviour
 {
     [Tooltip("Jump strenght.")]
-    public float JumpMagnitude = 8f;
+    public float JumpMagnitude = 12f;
 
     [Tooltip("The amount of force used to interrupt a jump.")]
     public float JumpInterruptStrength = 120f;
@@ -14,6 +14,22 @@ public class Player : MonoBehaviour
     [Tooltip("The distance below the player where jump input is registered while falling.")]
 	public float GroundCheckDistance = 0.5f;
 
+    [Tooltip("Will the player be able to slide off walls?")]
+    public bool WallSlide = true;
+
+    [Tooltip("How fast does the player slide off walls?")]
+    [Range(0, 1)]
+    public float WallFriction = 0.5f;
+
+    [Tooltip("Is wall jumping allowed?")]
+    public bool WallJump = true;
+
+    [Tooltip("Direction and strength of wall jump")]
+    public Vector2 WallJumpForce = new Vector2(12, 12);
+
+    [Tooltip("How long can wall jump still be performed after not touching a wall?")]
+    public float WallLinger = 0.1f;
+
     public bool Jumpping { get; set; }
     public bool JumpWhenGrounded { get; set; }
     public bool IsGrounded
@@ -22,10 +38,10 @@ public class Player : MonoBehaviour
         {
             if (_controller.State.IsCollidingBelow)
             {
-                _lingerTime = 0;
+                _groundLingerTime = 0;
                 return true;
             }
-            if (_lingerTime < GroundedLinger)
+            if (_groundLingerTime < GroundedLinger)
                 return true;
 
             return false;
@@ -41,14 +57,17 @@ public class Player : MonoBehaviour
             return rayHit;
         }
     }
-	public bool AnticipateJump
-    {
-        get { return !IsGrounded && GroundIsNear && _controller.Velocity.y < 0; }
-    }
+	public bool AnticipateJump { get { return !IsGrounded && GroundIsNear && _controller.Velocity.y < 0; } }
+    public bool IsTouchingWall { get { return _controller.State.IsCollidingLeft || _controller.State.IsCollidingRight; } }
+    public bool CanWallJump { get { return WallJump && (IsTouchingWall || _wallLingerTime < WallLinger); } }
+
+    private enum Walls {left, rigth};
 
 	private bool _isFacingRight;
 	private float _normalizedHorizontalSpeed;
-	private float _lingerTime;
+	private float _groundLingerTime;
+    private float _wallLingerTime;
+    private Walls _lastWallTouched;
 
 	private Transform _transform;
 	private BoxCollider2D _playerCollider;
@@ -64,10 +83,27 @@ public class Player : MonoBehaviour
 
 	void Update()
 	{
-        _lingerTime += Time.deltaTime;
+        _groundLingerTime += Time.deltaTime;
+        if (IsTouchingWall)
+        {
+            if (_controller.State.IsCollidingLeft)
+                _lastWallTouched = Walls.left;
+            else _lastWallTouched = Walls.rigth;
+            _wallLingerTime = 0;
+        }
+        else _wallLingerTime += Time.deltaTime;
+
         if (_controller.Velocity.y < 0)
             Jumpping = false;
 
+        if (WallSlide && IsTouchingWall && _controller.Velocity.y <= 0)
+        {
+            if (WallFriction == 1)
+                _controller.Parameters.Flying = true;
+            _controller.SetVerticalForce(_controller.Velocity.y * (1 - WallFriction));
+        }
+        else _controller.Parameters.Flying = false;
+        
 		HandleInput();
 		
 		var acceleration = IsGrounded ? _controller.Parameters.AccelerationOnGround : _controller.Parameters.AccelerationInAir;
@@ -89,6 +125,9 @@ public class Player : MonoBehaviour
 		if ((Input.GetButtonDown("Jump") && IsGrounded && !Jumpping) || (JumpWhenGrounded && IsGrounded)) 
 			Jump(JumpMagnitude);
 
+        else if (CanWallJump && Input.GetButtonDown("Jump"))
+            JumpOffWall(WallJumpForce);
+
 		if (Jumpping && !Input.GetButton("Jump"))
 			_controller.AddVerticalForce(-JumpInterruptStrength);
 
@@ -100,6 +139,14 @@ public class Player : MonoBehaviour
         JumpWhenGrounded = false;
         Jumpping = true;
         _controller.SetVerticalForce(magnitude);
+    }
+
+    void JumpOffWall(Vector2 force)
+    {
+        JumpWhenGrounded = false;
+        Jumpping = true;
+        var jumpVector = new Vector2(_lastWallTouched == Walls.left ? force.x : -force.x, force.y);
+        _controller.SetForce(jumpVector);
     }
 
 	void Flip()

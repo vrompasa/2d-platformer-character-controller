@@ -154,7 +154,7 @@ MonoBehaviour:
     MaxVelocity: {x: 3.4028235e+38, y: 3.4028235e+38}
     MaxSpeed: 4.5
     AccelerationOnGround: 20
-    AccelerationInAir: 10
+    AccelerationInAir: 5
 --- !u!114 &114026353312155618
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -171,3 +171,8 @@ MonoBehaviour:
   JumpInterruptStrength: 120
   GroundedLinger: 0.05
   GroundCheckDistance: 0.5
+  WallSlide: 1
+  WallFriction: 0.3
+  WallJump: 1
+  WallJumpForce: {x: 11, y: 10}
+  WallLinger: 0.1

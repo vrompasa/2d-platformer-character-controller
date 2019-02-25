@@ -175,3 +175,4 @@ MonoBehaviour:
   WallFriction: 0.3
   WallJump: 1
   WallJumpForce: {x: 11, y: 10}
+  WallLinger: 0.1

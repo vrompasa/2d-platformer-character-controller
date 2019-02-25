@@ -27,6 +27,9 @@ public class Player : MonoBehaviour
     [Tooltip("Direction and strength of wall jump")]
     public Vector2 WallJumpForce = new Vector2(12, 12);
 
+    [Tooltip("How long can wall jump still be performed after not touching a wall?")]
+    public float WallLinger = 0.1f;
+
     public bool Jumpping { get; set; }
     public bool JumpWhenGrounded { get; set; }
     public bool IsGrounded
@@ -35,10 +38,10 @@ public class Player : MonoBehaviour
         {
             if (_controller.State.IsCollidingBelow)
             {
-                _lingerTime = 0;
+                _groundLingerTime = 0;
                 return true;
             }
-            if (_lingerTime < GroundedLinger)
+            if (_groundLingerTime < GroundedLinger)
                 return true;
 
             return false;
@@ -56,11 +59,15 @@ public class Player : MonoBehaviour
     }
 	public bool AnticipateJump { get { return !IsGrounded && GroundIsNear && _controller.Velocity.y < 0; } }
     public bool IsTouchingWall { get { return _controller.State.IsCollidingLeft || _controller.State.IsCollidingRight; } }
-    public bool CanWallJump { get { return WallJump && IsTouchingWall; } }
+    public bool CanWallJump { get { return WallJump && (IsTouchingWall || _wallLingerTime < WallLinger); } }
+
+    private enum Walls {left, rigth};
 
 	private bool _isFacingRight;
 	private float _normalizedHorizontalSpeed;
-	private float _lingerTime;
+	private float _groundLingerTime;
+    private float _wallLingerTime;
+    private Walls _lastWallTouched;
 
 	private Transform _transform;
 	private BoxCollider2D _playerCollider;
@@ -76,7 +83,16 @@ public class Player : MonoBehaviour
 
 	void Update()
 	{
-        _lingerTime += Time.deltaTime;
+        _groundLingerTime += Time.deltaTime;
+        if (IsTouchingWall)
+        {
+            if (_controller.State.IsCollidingLeft)
+                _lastWallTouched = Walls.left;
+            else _lastWallTouched = Walls.rigth;
+            _wallLingerTime = 0;
+        }
+        else _wallLingerTime += Time.deltaTime;
+
         if (_controller.Velocity.y < 0)
             Jumpping = false;
 
@@ -129,7 +145,7 @@ public class Player : MonoBehaviour
     {
         JumpWhenGrounded = false;
         Jumpping = true;
-        var jumpVector = new Vector2(_controller.State.IsCollidingLeft ? force.x : -force.x, force.y);
+        var jumpVector = new Vector2(_lastWallTouched == Walls.left ? force.x : -force.x, force.y);
         _controller.SetForce(jumpVector);
     }
 

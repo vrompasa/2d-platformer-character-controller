@@ -100,7 +100,7 @@ public class Player : MonoBehaviour
         {
             if (WallFriction == 1)
                 _controller.Parameters.Flying = true;
-            _controller.SetVerticalForce(_controller.Velocity.y * (1 - WallFriction));
+            _controller.SetVerticalVelocity(_controller.Velocity.y * (1 - WallFriction));
         }
         else _controller.Parameters.Flying = false;
         
@@ -108,7 +108,7 @@ public class Player : MonoBehaviour
 		
 		var acceleration = IsGrounded ? _controller.Parameters.AccelerationOnGround : _controller.Parameters.AccelerationInAir;
 		
-		_controller.SetHorizontalForce(Mathf.Lerp(_controller.Velocity.x, _normalizedHorizontalSpeed * _controller.Parameters.MaxSpeed, Time.deltaTime * acceleration));
+		_controller.SetHorizontalVelocity(Mathf.Lerp(_controller.Velocity.x, _normalizedHorizontalSpeed * _controller.Parameters.MaxSpeed, Time.deltaTime * acceleration));
     }
 
 	void HandleInput()
@@ -138,7 +138,7 @@ public class Player : MonoBehaviour
     {
         JumpWhenGrounded = false;
         Jumpping = true;
-        _controller.SetVerticalForce(magnitude);
+        _controller.SetVerticalVelocity(magnitude);
     }
 
     void JumpOffWall(Vector2 force)
@@ -146,7 +146,7 @@ public class Player : MonoBehaviour
         JumpWhenGrounded = false;
         Jumpping = true;
         var jumpVector = new Vector2(_lastWallTouched == Walls.left ? force.x : -force.x, force.y);
-        _controller.SetForce(jumpVector);
+        _controller.SetVelocity(jumpVector);
     }
 
 	void Flip()

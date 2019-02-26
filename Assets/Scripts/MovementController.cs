@@ -62,7 +62,7 @@ public class MovementController : MonoBehaviour
         _velocity += force * Time.deltaTime;
     }
     
-    public void SetForce(Vector2 force)
+    public void SetVelocity(Vector2 force)
     {
         _velocity = force;
     }
@@ -72,7 +72,7 @@ public class MovementController : MonoBehaviour
         _velocity.x += x * Time.deltaTime;
     }
 
-    public void SetHorizontalForce(float x)
+    public void SetHorizontalVelocity(float x)
     {
         _velocity.x = x;
     }
@@ -82,7 +82,7 @@ public class MovementController : MonoBehaviour
         _velocity.y += y * Time.deltaTime;
     }
 
-    public void SetVerticalForce(float y)
+    public void SetVerticalVelocity(float y)
     {
         _velocity.y = y;
     }
@@ -171,7 +171,9 @@ public class MovementController : MonoBehaviour
 			if (!raycastHit)
 				continue;
 
-			if (raycastHit.collider.CompareTag("Platform") && (!isGoingDown || State.DropThroughPlatform))
+            var hitObject = raycastHit.transform.gameObject;
+
+			if (hitObject.CompareTag("Platform") && (!isGoingDown || State.DropThroughPlatform))
 				continue;
 
 			deltaMovement.y = raycastHit.point.y - rayVector.y;
